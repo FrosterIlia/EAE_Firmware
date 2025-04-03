@@ -33,14 +33,14 @@ FAN_MIN_SIGNAL = 0 # Fan is stopped
 # to achieve the best regulation and effectiveness
 
 # Coefficients for pump PID
-KP_PUMP = 1 # 10
-KI_PUMP = 1 # 20
-KD_PUMP = 0  # 0
+KP_PUMP = 10 # 10
+KI_PUMP = 12 # 12
+KD_PUMP = 0.2  # 0.2
 
 # Coefficients for fan PID
-KP_FAN = 1 # 10
-KI_FAN = 1 # 20
-KD_FAN = 0  # 0
+KP_FAN = 10 # 10
+KI_FAN = 12 # 12
+KD_FAN = 0.2  # 0.2
 
 def constrain(value, minimum, maximum):
     return max(min(value, maximum), minimum)

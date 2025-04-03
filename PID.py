@@ -19,12 +19,18 @@ class PID:
         self.prev_error = 0
         self.error = 0
 
+        self.first_time_flag = True
+
 
     def compute(self): #computing PID output using variable dt
         error = -(self.setpoint - self.input) # negative sign because system is cooling
-        self.I = self.I + error * self.ki * (time.time() - self.prev_time) #multiplying by ki here
-        D = (error - self.prev_error) / (time.time() - self.prev_time)
-        D = -D # negative sign because system is cooling
+        self.I = max(0, self.I + error * self.ki * (time.time() - self.prev_time)) #multiplying by ki here
+        if not self.first_time_flag: # trick to avoid an initial spike
+            D = (error - self.prev_error) / (time.time() - self.prev_time)
+            D = -D # negative sign because system is cooling
+        else:
+            self.first_time_flag = False
+            D = 0
 
         self.output = error * self.kp + self.I + D * self.kd #computing output
         self.prev_error = self.error
