@@ -1,12 +1,10 @@
 import time
 import sys
 from PID import PID
-import matplotlib.pyplot as plt
+import matplotlib as plt
 
 
 SET_TEMP = 60 # temperature to maintain to ensure maximum power operation witohut derating
-
-DATA_POINTS = 45
 
 # Passing command line arguments
 try:
@@ -33,21 +31,19 @@ FAN_MIN_SIGNAL = 0 # Fan is stopped
 # to achieve the best regulation and effectiveness
 
 # Coefficients for pump PID
-KP_PUMP = 1 # 10
-KI_PUMP = 1 # 20
-KD_PUMP = 0  # 0
+KP_PUMP = 1
+KI_PUMP = 1
+KD_PUMP = 0
 
 # Coefficients for fan PID
-KP_FAN = 1 # 10
-KI_FAN = 1 # 20
-KD_FAN = 0  # 0
+KP_FAN = 1
+KI_FAN = 1
+KD_FAN = 0
 
 def constrain(value, minimum, maximum):
     return max(min(value, maximum), minimum)
 
 def main():
-
-    start_time = time.time()
 
     time_points = []
     temperature_points = []
@@ -66,7 +62,7 @@ def main():
     fan_pid = PID(KP_FAN, KI_FAN, KD_FAN, SET_TEMP)
 
 
-    while ignition_switch and len(temperature_points) < DATA_POINTS:
+    while ignition_switch:
 
         # Emergency Shutdown
         if coolant_temp >= EMERGENCY_SHUTDOWN_TEMP:
@@ -97,39 +93,24 @@ def main():
 
         print(f"Coolant temperature: {round(coolant_temp, 2)}, Fan speed: {round(fan_speed, 2)}, Pump Speed: {round(pump_speed, 2)}")
 
-        # Collecting data for plotting
         time_points.append(time.time())
         temperature_points.append(coolant_temp)
         pump_signal_points.append(pump_speed)
         fan_signal_points.append(fan_speed)
 
-        time.sleep(0.2)
+        # Plotting the data
+        plt.figure(figsize=(10, 6))
+        
+        # Temperature plot
+        plt.subplot(3, 1, 1)
+        plt.plot(time_points, temperature_points, 'r-', label='Temperature')
+        plt.axhline(y=SET_TEMP, color='g', linestyle='--', label='Target Temp')
+        plt.ylabel('Temperature (°C)')
+        plt.title('Cooling System Performance')
+        plt.legend()
+        plt.grid(True)
 
-    
-    time_points = [i - start_time for i in time_points] # substracting start time from every point
-
-    # Plotting the data
-    plt.figure(figsize=(10, 6))
-    
-    # Temperature plot
-    plt.subplot(3, 1, 1)
-    plt.plot(time_points, temperature_points, 'r-', label='Temperature')
-    plt.axhline(y=SET_TEMP, color='g', linestyle='--', label='Target Temp')
-    plt.ylabel('Temperature (°C)')
-    plt.xlabel("Time (s)")
-    plt.title('Cooling System Performance')
-    plt.legend()
-
-    # Pump and fan signal plot
-    plt.subplot(3, 1, 2)
-    plt.plot(time_points, pump_signal_points, 'b-', label='Pump Speed') # Pump plot
-    plt.plot(time_points, fan_signal_points, 'g-', label='Fan Speed') # Fan plot
-    plt.ylabel('Speed')
-    plt.xlabel("Time (s)")
-    plt.legend()
-    plt.tight_layout()
-
-    plt.show()
+        time.sleep(0.5)
 
 if __name__ == "__main__":
     main()

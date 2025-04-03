@@ -1,4 +1,4 @@
-import time 
+import time
 
 # To make this class better output limits could be added
 # as well as direction of regulation (cooling or heating)
